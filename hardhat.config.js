@@ -1,10 +1,10 @@
 const config = require('./config')
 
-usePlugin('@nomiclabs/buidler-waffle')
-usePlugin("@nomiclabs/buidler-etherscan");
-usePlugin("buidler-gas-reporter");
-usePlugin('solidity-coverage');
-usePlugin('buidler-abi-exporter');
+require('@nomiclabs/hardhat-waffle')
+require("@nomiclabs/hardhat-etherscan");
+require("hardhat-gas-reporter");
+require('solidity-coverage');
+require('hardhat-abi-exporter');
 
 // This is a sample Buidler task. To learn how to create your own go to
 // https://buidler.dev/guides/create-task.html
@@ -19,15 +19,17 @@ task('accounts', 'Prints the list of accounts', async () => {
 // Some of the settings should be defined in `./config.js`.
 // Go to https://buidler.dev/config/ for the syntax.
 module.exports = {
-    solc: {
+    solidity: {
         version: '0.6.12',
-        optimizer: {
-            enabled: true,
-            runs: 1000,
+        settings: {
+            optimizer: {
+                enabled: true,
+                runs: 1000,
+            },
         },
     },
 
-    defaultNetwork: "buidlerevm",
+    defaultNetwork: "hardhat",
 
     networks: config.networks,
     etherscan: config.etherscan,
@@ -40,5 +42,6 @@ module.exports = {
         path: './abi',
         only: ['Staking', 'YieldFarm', 'YieldFarmLP', 'YieldFarmBond', 'CommunityVault'],
         clear: true,
+        flat: true,
     },
 }
