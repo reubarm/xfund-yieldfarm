@@ -1,5 +1,5 @@
 const { expect } = require('chai')
-const { ethers } = require('@nomiclabs/buidler')
+const { ethers } = require('hardhat')
 
 describe('CommunityVault', function () {
     let owner, user, communityVault, userAddr, ownerAddr, communityVaultAddr, creatorAccount, creatorAccountAddr

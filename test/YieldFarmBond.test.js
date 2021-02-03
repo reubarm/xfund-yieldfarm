@@ -1,5 +1,5 @@
 const { expect } = require('chai')
-const { ethers } = require('@nomiclabs/buidler')
+const { ethers } = require('hardhat')
 
 describe('YieldFarm Bond Pool', function () {
     let yieldFarm
