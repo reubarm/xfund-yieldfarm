@@ -6,12 +6,12 @@ describe('YieldFarm Bond Pool', function () {
     let staking
     let user, communityVault, userAddr, communityVaultAddr
     let bondToken, creatorAcc
-    const distributedAmount = ethers.BigNumber.from(60000).mul(ethers.BigNumber.from(10).pow(18))
+    const distributedAmount = ethers.BigNumber.from(60000).mul(ethers.BigNumber.from(10).pow(9))
     let snapshotId
     const epochDuration = 1000
     const NR_OF_EPOCHS = 12
 
-    const amount = ethers.BigNumber.from(100).mul(ethers.BigNumber.from(10).pow(18))
+    const amount = ethers.BigNumber.from(100).mul(ethers.BigNumber.from(10).pow(9))
     beforeEach(async function () {
         snapshotId = await ethers.provider.send('evm_snapshot')
         const [creator, userSigner] = await ethers.getSigners()
