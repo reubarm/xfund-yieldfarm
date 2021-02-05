@@ -1,12 +1,12 @@
 const { expect } = require('chai')
-const { ethers } = require('@nomiclabs/buidler')
+const { ethers } = require('hardhat')
 
 describe('YieldFarm', function () {
     let yieldFarm
     let staking
     let owner, user, communityVault, userAddr, communityVaultAddr
     let bondToken, usdc, susd, dai
-    const distributedAmount = ethers.BigNumber.from(800000).mul(ethers.BigNumber.from(10).pow(18))
+    const distributedAmount = ethers.BigNumber.from(800000).mul(ethers.BigNumber.from(10).pow(9))
     let snapshotId
     const epochDuration = 1000
 

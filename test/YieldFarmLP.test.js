@@ -1,17 +1,17 @@
 const { expect } = require('chai')
-const { ethers } = require('@nomiclabs/buidler')
+const { ethers } = require('hardhat')
 
 describe('YieldFarm Liquidity Pool', function () {
     let yieldFarm
     let staking
     let user, communityVault, userAddr, communityVaultAddr
     let bondToken, uniLP, creatorAcc
-    const distributedAmount = ethers.BigNumber.from(2000000).mul(ethers.BigNumber.from(10).pow(18))
+    const distributedAmount = ethers.BigNumber.from(100).mul(ethers.BigNumber.from(10).pow(9))
     let snapshotId
     const epochDuration = 1000
     const NR_OF_EPOCHS = 100
 
-    const amount = ethers.BigNumber.from(100).mul(ethers.BigNumber.from(10).pow(18))
+    const amount = ethers.BigNumber.from(1).mul(ethers.BigNumber.from(10).pow(18))
     beforeEach(async function () {
         snapshotId = await ethers.provider.send('evm_snapshot')
         const [creator, userSigner] = await ethers.getSigners()

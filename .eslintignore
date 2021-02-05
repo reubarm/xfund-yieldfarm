@@ -4,4 +4,4 @@ cache/
 coverage/
 node_modules/
 
-buidler.config.js
+hardhat.config.js

@@ -1,50 +1,40 @@
-const { ethers } = require('@nomiclabs/buidler')
+const { ethers } = require('hardhat')
 const BN = ethers.BigNumber
 
 async function main () {
-    const _bond = '0x64496f51779e400C5E955228E56fA41563Fb4dd8'
-    const _usdc = '0x6ddF381aBf26a9c57FBc34fcb9aceb7A101c84de'
-    const _susd = '0x9ac3462b9A259bAEF295A8C90b2984738fd7AadD'
-    const _dai = '0x95fD7265D5a4d8705d62A5840c5a0d69e019DCe4'
-    const _unilp = '0x9f11cd3f75920f3ab86ecb12f4f56398c2f854b2'
+    const tenPow9 = BN.from(10).pow(9)
+    const TOTAL_DISTRIBUTED_AMOUNT = 20
 
-    // We get the contract to deploy
+    const xfund = '0x245330351344F9301690D5D8De2A07f5F32e1149'
+    const unilp = '0x261aa758c5701635cad0c10e24acc2949855f187'
+
+    // Load xFUNDMOCK
+    const xFundMock = await ethers.getContractAt('xFUNDMockToken', xfund)
+
+    // Staking contract
     const Staking = await ethers.getContractFactory('Staking')
-    // start at 2020-10-19 00:00:00; epoch duration 7 days
-    const staking = await Staking.deploy(1603065600, 604800)
-    await staking.deployed()
 
+    // Epoch 1 starts at Fri, 05 Feb 2021 18:00:00 +0000 UTC and epoch duration of 12 hours
+    const staking = await Staking.deploy(1612548000, 43200)
+    await staking.deployed()
     console.log('Staking contract deployed to:', staking.address)
 
+    // Deploy Community Vault
     const communityVault = await ethers.getContractFactory('CommunityVault')
-    const cv = await communityVault.deploy(_bond)
+    const cv = await communityVault.deploy(xfund)
     await cv.deployed()
     console.log('CommunityVault deployed to:', cv.address)
 
-    const YieldFarm = await ethers.getContractFactory('YieldFarm')
+    // Deploy YieldFarm for Uniswap xFUND-ETH LP
     const YieldFarmLP = await ethers.getContractFactory('YieldFarmLP')
-    const YieldFarmBond = await ethers.getContractFactory('YieldFarmBond')
 
-    const yf = await YieldFarm.deploy(_bond, _usdc, _susd, _dai, staking.address, cv.address)
-    await yf.deployed()
-    console.log('YF deployed to:', yf.address)
-
-    const yflp = await YieldFarmLP.deploy(_bond, _unilp, staking.address, cv.address)
+    const yflp = await YieldFarmLP.deploy(xfund, unilp, staking.address, cv.address)
     await yflp.deployed()
     console.log('YF_LP deployed to:', yflp.address)
 
-    const yfbond = await YieldFarmBond.deploy(_bond, staking.address, cv.address)
-    await yfbond.deployed()
-    console.log('YF_BOND deployed to:', yfbond.address)
-
-    // initialize stuff
-    const tenPow18 = BN.from(10).pow(18)
-    const bond = await ethers.getContractAt('ERC20', _bond)
-    await bond.transfer(cv.address, BN.from(2860000).mul(tenPow18))
-
-    await cv.setAllowance(yf.address, BN.from(800000).mul(tenPow18))
-    await cv.setAllowance(yflp.address, BN.from(2000000).mul(tenPow18))
-    await cv.setAllowance(yfbond.address, BN.from(60000).mul(tenPow18))
+    // initialise stuff - send 20 xFUND to CV, and allow LP Yield Farm to spend 20 from CV
+    await xFundMock.transfer(cv.address, BN.from(TOTAL_DISTRIBUTED_AMOUNT).mul(tenPow9))
+    await cv.setAllowance(yflp.address, BN.from(TOTAL_DISTRIBUTED_AMOUNT).mul(tenPow9))
 }
 
 main()
