@@ -12,7 +12,7 @@ contract YieldFarmLP {
     using SafeMath for uint128;
 
     // constants
-    uint public constant TOTAL_DISTRIBUTED_AMOUNT = 2000000;
+    uint public constant TOTAL_DISTRIBUTED_AMOUNT = 100;
     uint public constant NR_OF_EPOCHS = 100;
 
     // state variables
@@ -21,7 +21,7 @@ contract YieldFarmLP {
     address private _uniLP;
     address private _communityVault;
     // contracts
-    IERC20 private _bond;
+    IERC20 private _xfund;
     IStaking private _staking;
 
 
@@ -37,14 +37,15 @@ contract YieldFarmLP {
     event Harvest(address indexed user, uint128 indexed epochId, uint256 amount);
 
     // constructor
-    constructor(address bondTokenAddress, address uniLP, address stakeContract, address communityVault) public {
-        _bond = IERC20(bondTokenAddress);
+    constructor(address xFundTokenAddress, address uniLP, address stakeContract, address communityVault) public {
+        _xfund = IERC20(xFundTokenAddress);
         _uniLP = uniLP;
         _staking = IStaking(stakeContract);
         _communityVault = communityVault;
         epochDuration = _staking.epochDuration();
         epochStart = _staking.epoch1Start() + epochDuration;
-        _totalAmountPerEpoch = TOTAL_DISTRIBUTED_AMOUNT.mul(10**18).div(NR_OF_EPOCHS);
+        // xFUND has 9 decimals
+        _totalAmountPerEpoch = TOTAL_DISTRIBUTED_AMOUNT.mul(10**9).div(NR_OF_EPOCHS);
     }
 
     // public methods
@@ -66,7 +67,7 @@ contract YieldFarmLP {
         emit MassHarvest(msg.sender, epochId - lastEpochIdHarvested[msg.sender], totalDistributedValue);
 
         if (totalDistributedValue > 0) {
-            _bond.transferFrom(_communityVault, msg.sender, totalDistributedValue);
+            _xfund.transferFrom(_communityVault, msg.sender, totalDistributedValue);
         }
 
         return totalDistributedValue;
@@ -78,7 +79,7 @@ contract YieldFarmLP {
         require (lastEpochIdHarvested[msg.sender].add(1) == epochId, "Harvest in order");
         uint userReward = _harvest(epochId);
         if (userReward > 0) {
-            _bond.transferFrom(_communityVault, msg.sender, userReward);
+            _xfund.transferFrom(_communityVault, msg.sender, userReward);
         }
         emit Harvest(msg.sender, epochId, userReward);
         return userReward;

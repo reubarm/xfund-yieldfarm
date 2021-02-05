@@ -45,7 +45,8 @@ contract YieldFarmBond {
         _communityVault = communityVault;
         epochDuration = _staking.epochDuration();
         epochStart = _staking.epoch1Start() + epochDuration.mul(EPOCHS_DELAYED_FROM_STAKING_CONTRACT);
-        _totalAmountPerEpoch = TOTAL_DISTRIBUTED_AMOUNT.mul(10**18).div(NR_OF_EPOCHS);
+        // xFUND has 9 decimals
+        _totalAmountPerEpoch = TOTAL_DISTRIBUTED_AMOUNT.mul(10**9).div(NR_OF_EPOCHS);
     }
 
     // public methods
