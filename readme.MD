@@ -1,14 +1,46 @@
 ### [Smart Contract External Audit](https://github.com/BarnBridge/BarnBridge-YieldFarming/blob/master/BarnBridge-Yield-Farming-and-Incentivization-AUDIT.pdf)
 
+## About
+
+An implementation of the [BarnBridge](https://github.com/BarnBridge/BarnBridge-YieldFarming)
+Yield Farm smart contracts, with modifications for xFUND and the Uniswap
+xFUND-ETH Liquidity Pool.
+
+Modifications to the smart contracts are minor/cosmetic, and as such should maintain
+integrity of the original smart contracts audit results.
+
+Modifications are as follows:
+
+1) Cosmetic changes - variable names `_bond` and `bond` changed to `_xfund` and `xfund`
+   in `CommunityVault.sol` and `YieldFarmLP.sol`
+2) xFUND has 9 decimals, not 18. The line
+
+```solidity
+_totalAmountPerEpoch = TOTAL_DISTRIBUTED_AMOUNT.mul(10**18).div(NR_OF_EPOCHS)
+```
+
+in `YieldFarmLP.sol`'s `constructor` function has been changed to:
+
+```solidity
+_totalAmountPerEpoch = TOTAL_DISTRIBUTED_AMOUNT.mul(10**9).div(NR_OF_EPOCHS)
+```
+
+3) The above modification has also been made to the other two YieldFarm contracts.
 
 ## Contracts
 
- [Staking](https://etherscan.io/address/0xb0fa2beee3cf36a7ac7e99b885b48538ab364853#tokentxns)
+###  Rinkeby Testnet
 
- [Community Vault](https://etherscan.io/address/0xA3C299eEE1998F45c20010276684921EBE6423D9)
+- [xFUNDMOCK](https://rinkeby.etherscan.io/token/0x245330351344f9301690d5d8de2a07f5f32e1149)
 
- [Yield Farm](https://etherscan.io/address/0xB3F7abF8FA1Df0fF61C5AC38d35e20490419f4bb#code)
+- [Uniswap xFUNDMOCK-ETH LP](https://rinkeby.etherscan.io/token/0x261aa758c5701635cad0c10e24acc2949855f187)
 
- [Yield Farm LP](https://etherscan.io/address/0xC25c37c387C5C909a94055F4f16184ca325D3a76#code)
- 
- [Yield Farm BOND](https://etherscan.io/address/0x3FdFb07472ea4771E1aD66FD3b87b265Cd4ec112#code)
+- [Staking] TBD
+
+- [Community Vault] TBD
+
+- [Yield Farm LP] TBD
+
+### Mainnet
+
+TBD
