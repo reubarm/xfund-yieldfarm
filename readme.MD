@@ -35,11 +35,11 @@ _totalAmountPerEpoch = TOTAL_DISTRIBUTED_AMOUNT.mul(10**9).div(NR_OF_EPOCHS)
 
 - [Uniswap xFUNDMOCK-ETH LP](https://rinkeby.etherscan.io/token/0x261aa758c5701635cad0c10e24acc2949855f187)
 
-- [Staking] TBD
+- [Staking](https://rinkeby.etherscan.io/address/0x1Da1B0e5DdcC97Ec8C9Ac093ab79DD3D5D8A58F6#code)
 
-- [Community Vault] TBD
+- [Community Vault](https://rinkeby.etherscan.io/address/0xb100bDb465ffd26F90B950EF9cE1cc8521351818#code)
 
-- [Yield Farm LP] TBD
+- [Yield Farm LP](https://rinkeby.etherscan.io/address/0x0E7f2297060c72B7685E6EB7a471e9cCF2e28015#code)
 
 ### Mainnet
 
