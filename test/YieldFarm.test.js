@@ -5,7 +5,7 @@ describe('YieldFarm', function () {
     let yieldFarm
     let staking
     let owner, user, communityVault, userAddr, communityVaultAddr
-    let bondToken, usdc, susd, dai
+    let xfundToken, usdc, susd, dai
     const distributedAmount = ethers.BigNumber.from(800000).mul(ethers.BigNumber.from(10).pow(9))
     let snapshotId
     const epochDuration = 1000
@@ -28,22 +28,22 @@ describe('YieldFarm', function () {
         const ERC20Mock = await ethers.getContractFactory('ERC20Mock')
         const CommunityVault = await ethers.getContractFactory('CommunityVault')
 
-        bondToken = await ERC20Mock.deploy()
+        xfundToken = await ERC20Mock.deploy()
         usdc = await ERC20Mock6Decimals.deploy()
         susd = await ERC20Mock.deploy()
         dai = await ERC20Mock.deploy()
-        communityVault = await CommunityVault.deploy(bondToken.address)
+        communityVault = await CommunityVault.deploy(xfundToken.address)
         communityVaultAddr = communityVault.address
         const YieldFarm = await ethers.getContractFactory('YieldFarm')
         yieldFarm = await YieldFarm.deploy(
-            bondToken.address,
+            xfundToken.address,
             usdc.address,
             susd.address,
             dai.address,
             staking.address,
             communityVaultAddr,
         )
-        await bondToken.mint(communityVaultAddr, distributedAmount)
+        await xfundToken.mint(communityVaultAddr, distributedAmount)
         await communityVault.connect(creator).setAllowance(yieldFarm.address, distributedAmount)
     })
 
@@ -55,7 +55,7 @@ describe('YieldFarm', function () {
         it('should be deployed', async function () {
             expect(staking.address).to.not.equal(0)
             expect(yieldFarm.address).to.not.equal(0)
-            expect(bondToken.address).to.not.equal(0)
+            expect(xfundToken.address).to.not.equal(0)
         })
         it('Get epoch PoolSize and distribute tokens', async function () {
             await depositUsdc(amountUSDC)
@@ -66,11 +66,11 @@ describe('YieldFarm', function () {
             const totalAmount = amount.mul(3)
             expect(await yieldFarm.getPoolSize(1)).to.equal(totalAmount)
             expect(await yieldFarm.getEpochStake(userAddr, 1)).to.equal(totalAmount)
-            expect(await bondToken.allowance(communityVaultAddr, yieldFarm.address)).to.equal(distributedAmount)
+            expect(await xfundToken.allowance(communityVaultAddr, yieldFarm.address)).to.equal(distributedAmount)
             expect(await yieldFarm.getCurrentEpoch()).to.equal(3)
 
             await yieldFarm.connect(user).harvest(1)
-            expect(await bondToken.balanceOf(userAddr)).to.equal(distributedAmount.div(25))
+            expect(await xfundToken.balanceOf(userAddr)).to.equal(distributedAmount.div(25))
         })
     })
 
@@ -87,7 +87,7 @@ describe('YieldFarm', function () {
             await expect(yieldFarm.harvest(3)).to.be.revertedWith('Harvest in order')
 
             await (await yieldFarm.connect(user).harvest(1)).wait()
-            expect(await bondToken.balanceOf(userAddr)).to.equal(
+            expect(await xfundToken.balanceOf(userAddr)).to.equal(
                 amount.mul(distributedAmount.div(25)).div(totalAmount),
             )
             expect(await yieldFarm.connect(user).userLastEpochIdHarvested()).to.equal(1)
@@ -95,7 +95,7 @@ describe('YieldFarm', function () {
 
             await (await yieldFarm.connect(user).massHarvest()).wait()
             const totalDistributedAmount = amount.mul(distributedAmount.div(25)).div(totalAmount).mul(7)
-            expect(await bondToken.balanceOf(userAddr)).to.equal(totalDistributedAmount)
+            expect(await xfundToken.balanceOf(userAddr)).to.equal(totalDistributedAmount)
             expect(await yieldFarm.connect(user).userLastEpochIdHarvested()).to.equal(7)
             expect(await yieldFarm.lastInitializedEpoch()).to.equal(7) // epoch 7 have been initialized
         })
@@ -105,9 +105,9 @@ describe('YieldFarm', function () {
             await moveAtEpoch(9)
             expect(await yieldFarm.getPoolSize(1)).to.equal(amount)
             await yieldFarm.connect(owner).harvest(1)
-            expect(await bondToken.balanceOf(await owner.getAddress())).to.equal(0)
+            expect(await xfundToken.balanceOf(await owner.getAddress())).to.equal(0)
             await yieldFarm.connect(owner).massHarvest()
-            expect(await bondToken.balanceOf(await owner.getAddress())).to.equal(0)
+            expect(await xfundToken.balanceOf(await owner.getAddress())).to.equal(0)
         })
 
         it('harvest maximum 25 epochs', async function () {
@@ -128,7 +128,7 @@ describe('YieldFarm', function () {
         it('it should return 0 if no deposit in an epoch', async function () {
             await moveAtEpoch(3)
             await yieldFarm.connect(owner).harvest(1)
-            expect(await bondToken.balanceOf(await owner.getAddress())).to.equal(0)
+            expect(await xfundToken.balanceOf(await owner.getAddress())).to.equal(0)
         })
     })
 

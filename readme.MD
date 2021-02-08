@@ -41,6 +41,8 @@ _totalAmountPerEpoch = TOTAL_DISTRIBUTED_AMOUNT.mul(10**9).div(NR_OF_EPOCHS)
 
 - [Yield Farm LP](https://rinkeby.etherscan.io/address/0x0E7f2297060c72B7685E6EB7a471e9cCF2e28015#code)
 
+- [Yield Farm xFUND](https://rinkeby.etherscan.io/address/0xF9fea950b33D76FA0C4bFE2ce93ef31F0F5A0885#code)
+
 ### Mainnet
 
 TBD

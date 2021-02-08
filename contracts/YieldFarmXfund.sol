@@ -5,16 +5,16 @@ import "@openzeppelin/contracts-ethereum-package/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "./interfaces/IStaking.sol";
 
-contract YieldFarmBond {
+contract YieldFarmXfund {
 
     // lib
     using SafeMath for uint;
     using SafeMath for uint128;
 
     // constants
-    uint public constant TOTAL_DISTRIBUTED_AMOUNT = 60000;
-    uint public constant NR_OF_EPOCHS = 12;
-    uint128 public constant EPOCHS_DELAYED_FROM_STAKING_CONTRACT = 4;
+    uint public constant TOTAL_DISTRIBUTED_AMOUNT = 10;
+    uint public constant NR_OF_EPOCHS = 10;
+    uint128 public constant EPOCHS_DELAYED_FROM_STAKING_CONTRACT = 8;
 
     // state variables
 
@@ -22,7 +22,7 @@ contract YieldFarmBond {
     address private _poolTokenAddress;
     address private _communityVault;
     // contracts
-    IERC20 private _bond;
+    IERC20 private _xfund;
     IStaking private _staking;
 
 
@@ -38,9 +38,9 @@ contract YieldFarmBond {
     event Harvest(address indexed user, uint128 indexed epochId, uint256 amount);
 
     // constructor
-    constructor(address bondTokenAddress, address stakeContract, address communityVault) public {
-        _bond = IERC20(bondTokenAddress);
-        _poolTokenAddress = bondTokenAddress;
+    constructor(address xfundTokenAddress, address stakeContract, address communityVault) public {
+        _xfund = IERC20(xfundTokenAddress);
+        _poolTokenAddress = xfundTokenAddress;
         _staking = IStaking(stakeContract);
         _communityVault = communityVault;
         epochDuration = _staking.epochDuration();
@@ -68,7 +68,7 @@ contract YieldFarmBond {
         emit MassHarvest(msg.sender, epochId - lastEpochIdHarvested[msg.sender], totalDistributedValue);
 
         if (totalDistributedValue > 0) {
-            _bond.transferFrom(_communityVault, msg.sender, totalDistributedValue);
+            _xfund.transferFrom(_communityVault, msg.sender, totalDistributedValue);
         }
 
         return totalDistributedValue;
@@ -80,7 +80,7 @@ contract YieldFarmBond {
         require (lastEpochIdHarvested[msg.sender].add(1) == epochId, "Harvest in order");
         uint userReward = _harvest(epochId);
         if (userReward > 0) {
-            _bond.transferFrom(_communityVault, msg.sender, userReward);
+            _xfund.transferFrom(_communityVault, msg.sender, userReward);
         }
         emit Harvest(msg.sender, epochId, userReward);
         return userReward;
