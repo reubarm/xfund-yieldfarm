@@ -24,7 +24,7 @@ contract YieldFarm {
     address private _dai;
     address private _communityVault;
     // contracts
-    IERC20 private _bond;
+    IERC20 private _xfund;
     IStaking private _staking;
 
 
@@ -46,8 +46,8 @@ contract YieldFarm {
     event Harvest(address indexed user, uint128 indexed epochId, uint256 amount);
 
     // constructor
-    constructor(address bondTokenAddress, address usdc, address susd, address dai, address stakeContract, address communityVault) public {
-        _bond = IERC20(bondTokenAddress);
+    constructor(address xfundTokenAddress, address usdc, address susd, address dai, address stakeContract, address communityVault) public {
+        _xfund = IERC20(xfundTokenAddress);
         _usdc = usdc;
         _susd = susd;
         _dai = dai;
@@ -78,7 +78,7 @@ contract YieldFarm {
         emit MassHarvest(msg.sender, epochId.sub(lastEpochIdHarvested[msg.sender]), totalDistributedValue);
 
         if (totalDistributedValue > 0) {
-            _bond.transferFrom(_communityVault, msg.sender, totalDistributedValue);
+            _xfund.transferFrom(_communityVault, msg.sender, totalDistributedValue);
         }
 
         return totalDistributedValue;
@@ -90,7 +90,7 @@ contract YieldFarm {
         require (lastEpochIdHarvested[msg.sender].add(1) == epochId, "Harvest in order");
         uint userReward = _harvest(epochId);
         if (userReward > 0) {
-            _bond.transferFrom(_communityVault, msg.sender, userReward);
+            _xfund.transferFrom(_communityVault, msg.sender, userReward);
         }
         emit Harvest(msg.sender, epochId, userReward);
         return userReward;
