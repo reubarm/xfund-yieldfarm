@@ -42,6 +42,7 @@ async function main () {
     const Staking = await ethers.getContractFactory('Staking')
 
     const staking = await Staking.deploy(Math.floor(Date.now() / 1000) + 1000, 1000)
+
     await staking.deployed()
 
     console.log('Staking contract deployed to:', staking.address)
@@ -57,11 +58,18 @@ async function main () {
     await yflp.deployed()
     console.log('YF_LP deployed to:', yflp.address)
 
-    // initialise stuff
-    await xfund.transfer(cv.address, BN.from(100).mul(tenPow9))
-    await cv.setAllowance(yflp.address, BN.from(100).mul(tenPow9))
+    // Deploy YieldFarm for xFUND
+    const YieldFarmXfund = await ethers.getContractFactory('YieldFarmXfund')
+    const yfxf = await YieldFarmXfund.deploy(xfund.address, staking.address, cv.address)
+    await yfxf.deployed()
+    console.log('YF_xFUND deployed to:', yfxf.address)
 
-    // some staking
+    // initialise stuff
+    await xfund.transfer(cv.address, BN.from(200).mul(tenPow9))
+    await cv.setAllowance(yflp.address, BN.from(150).mul(tenPow9))
+    await cv.setAllowance(yfxf.address, BN.from(50).mul(tenPow9))
+
+    // some staking - LP
     await unilp.connect(user1).approve(staking.address, BN.from('500000000000000000'))
     await staking.connect(user1).deposit(unilp.address, BN.from('500000000000000000'))
 
@@ -70,6 +78,16 @@ async function main () {
 
     await unilp.connect(user3).approve(staking.address, BN.from('1500000000000000000'))
     await staking.connect(user3).deposit(unilp.address, BN.from('1500000000000000000'))
+
+    // some staking - xFUND
+    await xfund.connect(user1).approve(staking.address, BN.from('3000000000'))
+    await staking.connect(user1).deposit(xfund.address, BN.from('3000000000'))
+
+    await xfund.connect(user2).approve(staking.address, BN.from('2000000000'))
+    await staking.connect(user2).deposit(xfund.address, BN.from('2000000000'))
+
+    await xfund.connect(user3).approve(staking.address, BN.from('1000000000'))
+    await staking.connect(user3).deposit(xfund.address, BN.from('1000000000'))
 
     console.log('Finished')
 }

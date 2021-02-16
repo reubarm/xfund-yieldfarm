@@ -2,11 +2,11 @@ const { ethers } = require('hardhat')
 
 async function main () {
     const tokens = [
-        '0x261aa758c5701635cad0c10e24acc2949855f187',
-        '0x245330351344F9301690D5D8De2A07f5F32e1149',
+        '0x892a6f9df0147e5f079b0993f486f9aca3c87881',
+        '0xab2d2f5bc36620a57ec4bb60d6a7df2a847deab5',
     ]
 
-    const _staking = '0x1Da1B0e5DdcC97Ec8C9Ac093ab79DD3D5D8A58F6'
+    const _staking = '0x2E9ade949900e19735689686E61BF6338a65B881'
     const s = await ethers.getContractAt('Staking', _staking)
 
     const currentEpoch = parseInt(await s.getCurrentEpoch())
