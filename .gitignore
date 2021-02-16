@@ -122,3 +122,6 @@ config.js
 
 # IDE settings
 .idea/
+
+# Project specific
+scripts/individual
