@@ -12,8 +12,9 @@ contract YieldFarmLP {
     using SafeMath for uint128;
 
     // constants
-    uint public constant TOTAL_DISTRIBUTED_AMOUNT = 100;
-    uint public constant NR_OF_EPOCHS = 100;
+    uint public constant TOTAL_DISTRIBUTED_AMOUNT = 750;
+    uint public constant NR_OF_EPOCHS = 10;
+    uint128 public constant EPOCHS_DELAYED_FROM_STAKING_CONTRACT = 0;
 
     // state variables
 
@@ -43,7 +44,7 @@ contract YieldFarmLP {
         _staking = IStaking(stakeContract);
         _communityVault = communityVault;
         epochDuration = _staking.epochDuration();
-        epochStart = _staking.epoch1Start() + epochDuration;
+        epochStart = _staking.epoch1Start() + epochDuration.mul(EPOCHS_DELAYED_FROM_STAKING_CONTRACT);
         // xFUND has 9 decimals
         _totalAmountPerEpoch = TOTAL_DISTRIBUTED_AMOUNT.mul(10**9).div(NR_OF_EPOCHS);
     }
@@ -75,7 +76,7 @@ contract YieldFarmLP {
     function harvest (uint128 epochId) external returns (uint){
         // checks for requested epoch
         require (_getEpochId() > epochId, "This epoch is in the future");
-        require(epochId <= NR_OF_EPOCHS, "Maximum number of epochs is 100");
+        require(epochId <= NR_OF_EPOCHS, "Maximum number of epochs is 10");
         require (lastEpochIdHarvested[msg.sender].add(1) == epochId, "Harvest in order");
         uint userReward = _harvest(epochId);
         if (userReward > 0) {
@@ -152,8 +153,8 @@ contract YieldFarmLP {
         epochId = uint128(block.timestamp.sub(epochStart).div(epochDuration).add(1));
     }
 
-    // get the staking epoch which is 1 epoch more
+    // get the staking epoch
     function _stakingEpochId(uint128 epochId) pure internal returns (uint128) {
-        return epochId + 1;
+        return epochId + EPOCHS_DELAYED_FROM_STAKING_CONTRACT;
     }
 }
