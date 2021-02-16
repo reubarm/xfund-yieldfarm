@@ -29,6 +29,16 @@ _totalAmountPerEpoch = TOTAL_DISTRIBUTED_AMOUNT.mul(10**9).div(NR_OF_EPOCHS)
 
 ## Contracts
 
+### Mainnet
+
+- [Staking](https://etherscan.io/address/0x2E9ade949900e19735689686E61BF6338a65B881#code)
+
+- [Community Vault](https://etherscan.io/address/0x9e84d9DB70fb5767f7bD2A7013C189b4CA8CC374#code)
+
+- [Yield Farm LP](https://etherscan.io/address/0xE5b72154bce0e75dA73Da3d9D9F3B17A6eAE31DD#code)
+
+- [Yield Farm xFUND](https://etherscan.io/address/0x76D03D983494Cf6087E9e0F330B7C5872E24Da65#code)
+
 ###  Rinkeby Testnet
 
 - [xFUNDMOCK](https://rinkeby.etherscan.io/token/0x245330351344f9301690d5d8de2a07f5f32e1149)
@@ -42,7 +52,3 @@ _totalAmountPerEpoch = TOTAL_DISTRIBUTED_AMOUNT.mul(10**9).div(NR_OF_EPOCHS)
 - [Yield Farm LP](https://rinkeby.etherscan.io/address/0x0E7f2297060c72B7685E6EB7a471e9cCF2e28015#code)
 
 - [Yield Farm xFUND](https://rinkeby.etherscan.io/address/0xF9fea950b33D76FA0C4bFE2ce93ef31F0F5A0885#code)
-
-### Mainnet
-
-TBD
