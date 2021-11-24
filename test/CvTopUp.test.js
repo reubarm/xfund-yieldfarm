@@ -1,27 +1,26 @@
 const { expect } = require('chai')
 const { ethers } = require('hardhat')
 
-describe('YieldFarm xFUND Pool', function () {
+describe('YieldFarm UNiX Pool', function () {
     let yieldFarm
     let staking
     let user, communityVault, userAddr, communityVaultAddr
-    let xfundToken, uniLP
+    let unixToken, uniLP
 
-    const TOTAL_TOKENS = 750
-    const NR_OF_EPOCHS = 10
+    const TOTAL_TOKENS = 48000000
+    const NR_OF_EPOCHS = 6
     const epochDuration = 1000
 
-    const distributedAmount = ethers.BigNumber.from(TOTAL_TOKENS).mul(ethers.BigNumber.from(10).pow(9))
+    const distributedAmount = ethers.BigNumber.from(TOTAL_TOKENS).mul(ethers.BigNumber.from(10).pow(18))
     let snapshotId
     const PER_EPOCH = TOTAL_TOKENS / NR_OF_EPOCHS
 
-    const amount = ethers.BigNumber.from(PER_EPOCH).mul(ethers.BigNumber.from(10).pow(9))
+    const amount = ethers.BigNumber.from(PER_EPOCH).mul(ethers.BigNumber.from(10).pow(18))
 
     beforeEach(async function () {
         snapshotId = await ethers.provider.send('evm_snapshot')
         const [creator, userSigner] = await ethers.getSigners()
         user = userSigner
-        creatorAcc = creator
         userAddr = await user.getAddress()
 
         const Staking = await ethers.getContractFactory('Staking', creator)
@@ -32,18 +31,18 @@ describe('YieldFarm xFUND Pool', function () {
         const ERC20Mock = await ethers.getContractFactory('ERC20Mock')
         const CommunityVault = await ethers.getContractFactory('CommunityVault')
 
-        xfundToken = await ERC20Mock.deploy()
+        unixToken = await ERC20Mock.deploy()
         uniLP = await ERC20Mock.deploy()
-        communityVault = await CommunityVault.deploy(xfundToken.address)
+        communityVault = await CommunityVault.deploy(unixToken.address)
         communityVaultAddr = communityVault.address
         const YieldFarm = await ethers.getContractFactory('YieldFarmLP')
         yieldFarm = await YieldFarm.deploy(
-            xfundToken.address,
+            unixToken.address,
             uniLP.address,
             staking.address,
             communityVaultAddr,
         )
-        await xfundToken.mint(communityVaultAddr, amount)
+        await unixToken.mint(communityVaultAddr, amount)
         await communityVault.connect(creator).setAllowance(yieldFarm.address, distributedAmount)
     })
 
@@ -65,22 +64,22 @@ describe('YieldFarm xFUND Pool', function () {
             moveAtEpoch(5)
             await (await yieldFarm.connect(user).harvest(1)).wait()
             expect(
-                await xfundToken.balanceOf(userAddr))
+                await unixToken.balanceOf(userAddr))
                 .to.equal(distributedAmount.div(NR_OF_EPOCHS))
             await expect(yieldFarm.connect(user).harvest(2))
                 .to.be.revertedWith('ERC20: transfer amount exceeds balance')
-            await xfundToken.mint(communityVaultAddr, amount)
+            await unixToken.mint(communityVaultAddr, amount)
             await (await yieldFarm.connect(user).harvest(2)).wait()
             expect(
-                await xfundToken.balanceOf(userAddr))
+                await unixToken.balanceOf(userAddr))
                 .to.equal(distributedAmount.div(NR_OF_EPOCHS).mul(2))
 
             await expect(yieldFarm.connect(user).harvest(3))
                 .to.be.revertedWith('ERC20: transfer amount exceeds balance')
-            await xfundToken.mint(communityVaultAddr, amount)
+            await unixToken.mint(communityVaultAddr, amount)
             await (await yieldFarm.connect(user).harvest(3)).wait()
             expect(
-                await xfundToken.balanceOf(userAddr))
+                await unixToken.balanceOf(userAddr))
                 .to.equal(distributedAmount.div(NR_OF_EPOCHS).mul(3))
         })
 
@@ -91,10 +90,10 @@ describe('YieldFarm xFUND Pool', function () {
                 const currEpoch = await yieldFarm.getCurrentEpoch()
                 if (currEpoch > 1) {
                     const toHarvest = currEpoch - 1
-                    await xfundToken.mint(communityVaultAddr, amount)
+                    await unixToken.mint(communityVaultAddr, amount)
                     await (await yieldFarm.connect(user).harvest(toHarvest)).wait()
                     expect(
-                        await xfundToken.balanceOf(userAddr))
+                        await unixToken.balanceOf(userAddr))
                         .to.equal(distributedAmount.div(NR_OF_EPOCHS).mul(toHarvest))
                 }
             }

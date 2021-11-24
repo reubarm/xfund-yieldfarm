@@ -8,11 +8,6 @@
       },
       {
         "internalType": "address",
-        "name": "uniLP",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
         "name": "stakeContract",
         "type": "address"
       },
