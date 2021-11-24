@@ -5,15 +5,15 @@ import "@openzeppelin/contracts-ethereum-package/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "./interfaces/IStaking.sol";
 
-contract YieldFarmXfund {
+contract YieldFarmUnix {
 
     // lib
     using SafeMath for uint;
     using SafeMath for uint128;
 
     // constants
-    uint public constant TOTAL_DISTRIBUTED_AMOUNT = 250;
-    uint public constant NR_OF_EPOCHS = 10;
+    uint public constant TOTAL_DISTRIBUTED_AMOUNT = 12000000;
+    uint public constant NR_OF_EPOCHS = 6;
     uint128 public constant EPOCHS_DELAYED_FROM_STAKING_CONTRACT = 0;
 
     // state variables
@@ -22,7 +22,7 @@ contract YieldFarmXfund {
     address private _poolTokenAddress;
     address private _communityVault;
     // contracts
-    IERC20 private _xfund;
+    IERC20 private _unix;
     IStaking private _staking;
 
 
@@ -38,15 +38,14 @@ contract YieldFarmXfund {
     event Harvest(address indexed user, uint128 indexed epochId, uint256 amount);
 
     // constructor
-    constructor(address xfundTokenAddress, address stakeContract, address communityVault) public {
-        _xfund = IERC20(xfundTokenAddress);
-        _poolTokenAddress = xfundTokenAddress;
+    constructor(address unixTokenAddress, address stakeContract, address communityVault) public {
+        _unix = IERC20(unixTokenAddress);
+        _poolTokenAddress = unixTokenAddress;
         _staking = IStaking(stakeContract);
         _communityVault = communityVault;
         epochDuration = _staking.epochDuration();
         epochStart = _staking.epoch1Start() + epochDuration.mul(EPOCHS_DELAYED_FROM_STAKING_CONTRACT);
-        // xFUND has 9 decimals
-        _totalAmountPerEpoch = TOTAL_DISTRIBUTED_AMOUNT.mul(10**9).div(NR_OF_EPOCHS);
+        _totalAmountPerEpoch = TOTAL_DISTRIBUTED_AMOUNT.mul(10**18).div(NR_OF_EPOCHS);
     }
 
     // public methods
@@ -68,7 +67,7 @@ contract YieldFarmXfund {
         emit MassHarvest(msg.sender, epochId - lastEpochIdHarvested[msg.sender], totalDistributedValue);
 
         if (totalDistributedValue > 0) {
-            _xfund.transferFrom(_communityVault, msg.sender, totalDistributedValue);
+            _unix.transferFrom(_communityVault, msg.sender, totalDistributedValue);
         }
 
         return totalDistributedValue;
@@ -76,11 +75,11 @@ contract YieldFarmXfund {
     function harvest (uint128 epochId) external returns (uint){
         // checks for requested epoch
         require (_getEpochId() > epochId, "This epoch is in the future");
-        require(epochId <= NR_OF_EPOCHS, "Maximum number of epochs is 10");
+        require(epochId <= NR_OF_EPOCHS, "Maximum number of epochs is 6");
         require (lastEpochIdHarvested[msg.sender].add(1) == epochId, "Harvest in order");
         uint userReward = _harvest(epochId);
         if (userReward > 0) {
-            _xfund.transferFrom(_communityVault, msg.sender, userReward);
+            _unix.transferFrom(_communityVault, msg.sender, userReward);
         }
         emit Harvest(msg.sender, epochId, userReward);
         return userReward;

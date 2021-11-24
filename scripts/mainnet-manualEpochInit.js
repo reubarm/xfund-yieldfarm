@@ -2,8 +2,9 @@ const { ethers } = require('hardhat')
 
 async function main () {
     const tokens = [
-        '0x892a6f9df0147e5f079b0993f486f9aca3c87881',
-        '0xab2d2f5bc36620a57ec4bb60d6a7df2a847deab5',
+        '0x892a6f9df0147e5f079b0993f486f9aca3c87881', // UNiX
+        '0xab2d2f5bc36620a57ec4bb60d6a7df2a847deab5', // unilp
+        '0x43a76c98cd94e309b0ab1757a42a51bcaa334ff5', // Shibaswap
     ]
 
     const _staking = '0x2E9ade949900e19735689686E61BF6338a65B881'

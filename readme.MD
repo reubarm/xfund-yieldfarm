@@ -3,52 +3,40 @@
 ## About
 
 An implementation of the [BarnBridge](https://github.com/BarnBridge/BarnBridge-YieldFarming)
-Yield Farm smart contracts, with modifications for xFUND and the Uniswap
-xFUND-ETH Liquidity Pool.
+Yield Farm smart contracts, with modifications for UniX and the Uniswap
+UniX-ETH Liquidity Pool.
 
 Modifications to the smart contracts are minor/cosmetic, and as such should maintain
 integrity of the original smart contracts audit results.
 
 Modifications are as follows:
 
-1) Cosmetic changes - variable names `_bond` and `bond` changed to `_xfund` and `xfund`
+1) Cosmetic changes - variable names `_bond` and `bond` changed to `_unix` and `unix`
    in `CommunityVault.sol` and `YieldFarmLP.sol`
-2) xFUND has 9 decimals, not 18. The line
-
-```solidity
-_totalAmountPerEpoch = TOTAL_DISTRIBUTED_AMOUNT.mul(10**18).div(NR_OF_EPOCHS)
-```
-
-in `YieldFarmLP.sol`'s `constructor` function has been changed to:
-
-```solidity
-_totalAmountPerEpoch = TOTAL_DISTRIBUTED_AMOUNT.mul(10**9).div(NR_OF_EPOCHS)
-```
-
-3) The above modification has also been made to the other two YieldFarm contracts.
+2) The above modification has also been made to the other YieldFarm contracts.
 
 ## Contracts
 
 ### Mainnet
 
-- [Staking](https://etherscan.io/address/0x2E9ade949900e19735689686E61BF6338a65B881#code)
+- [Staking](https://etherscan.io/address/#code)
 
-- [Community Vault](https://etherscan.io/address/0x9e84d9DB70fb5767f7bD2A7013C189b4CA8CC374#code)
+- [Community Vault](https://etherscan.io/address/#code)
 
-- [Yield Farm LP](https://etherscan.io/address/0xE5b72154bce0e75dA73Da3d9D9F3B17A6eAE31DD#code)
+- [Yield Farm LP](https://etherscan.io/address/#code)
 
-- [Yield Farm xFUND](https://etherscan.io/address/0x76D03D983494Cf6087E9e0F330B7C5872E24Da65#code)
+- [Yield Farm UNiX](https://etherscan.io/address/#code)
 
 ###  Rinkeby Testnet
 
-- [xFUNDMOCK](https://rinkeby.etherscan.io/token/0x245330351344f9301690d5d8de2a07f5f32e1149)
+- [UNiX](https://rinkeby.etherscan.io/address/0xDDD6A0ECc3c6F6C102E5eA3d8Af7B801d1a77aC8)
 
-- [Uniswap xFUNDMOCK-ETH LP](https://rinkeby.etherscan.io/token/0x261aa758c5701635cad0c10e24acc2949855f187)
+- [Uniswap UNiX-ETH LP](https://rinkeby.etherscan.io/address/0xb85d6cd4d8102ceff4d95bf8d12478eeb55345c7)
 
-- [Staking](https://rinkeby.etherscan.io/address/0x1Da1B0e5DdcC97Ec8C9Ac093ab79DD3D5D8A58F6#code)
+- [Staking](https://rinkeby.etherscan.io/address/0x84D72A804bC00DABe61de2Edf3131acCe3e83ef1#code)
 
-- [Community Vault](https://rinkeby.etherscan.io/address/0xb100bDb465ffd26F90B950EF9cE1cc8521351818#code)
+- [Community Vault](https://rinkeby.etherscan.io/address/0x69D1C2F23C1665A5d19e78106522e8e05d407dA1#code)
 
-- [Yield Farm LP](https://rinkeby.etherscan.io/address/0x0E7f2297060c72B7685E6EB7a471e9cCF2e28015#code)
+- [Yield Farm LP](https://rinkeby.etherscan.io/address/0x329cd24CDbcF58f1011A56A077E8A5cAd5c8B5E3#code)
 
-- [Yield Farm xFUND](https://rinkeby.etherscan.io/address/0xF9fea950b33D76FA0C4bFE2ce93ef31F0F5A0885#code)
+- [Yield Farm UNiX](https://rinkeby.etherscan.io/address/0x8eD7Ff716e9462C71CA0496C82CAFA6ec4997565#code)

@@ -5,16 +5,16 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 contract CommunityVault is Ownable {
 
-    IERC20 private _xfund;
+    IERC20 private _unix;
 
-    constructor (address xfund) public {
-        _xfund = IERC20(xfund);
+    constructor (address unix) public {
+        _unix = IERC20(unix);
     }
 
     event SetAllowance(address indexed caller, address indexed spender, uint256 amount);
 
     function setAllowance(address spender, uint amount) public onlyOwner {
-        _xfund.approve(spender, amount);
+        _unix.approve(spender, amount);
 
         emit SetAllowance(msg.sender, spender, amount);
     }

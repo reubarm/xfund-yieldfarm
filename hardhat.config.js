@@ -52,7 +52,7 @@ module.exports = {
 
     abiExporter: {
         path: './abi',
-        only: ['Staking', 'YieldFarm', 'YieldFarmLP', 'YieldFarmXfund', 'CommunityVault'],
+        only: ['Staking', 'YieldFarmLP', 'YieldFarmUnix', 'CommunityVault'],
         clear: true,
         flat: true,
     },

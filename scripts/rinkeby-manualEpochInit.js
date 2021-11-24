@@ -2,11 +2,11 @@ const { ethers } = require('hardhat')
 
 async function main () {
     const tokens = [
-        '0x261aa758c5701635cad0c10e24acc2949855f187',
-        '0x245330351344F9301690D5D8De2A07f5F32e1149',
+        '0xDDD6A0ECc3c6F6C102E5eA3d8Af7B801d1a77aC8',
+        '0xb85d6cd4d8102ceff4d95bf8d12478eeb55345c7',
     ]
 
-    const _staking = '0x1Da1B0e5DdcC97Ec8C9Ac093ab79DD3D5D8A58F6'
+    const _staking = '0x84D72A804bC00DABe61de2Edf3131acCe3e83ef1'
     const s = await ethers.getContractAt('Staking', _staking)
 
     const currentEpoch = parseInt(await s.getCurrentEpoch())
@@ -39,6 +39,7 @@ async function main () {
                 console.log(`${token}: trying to init epoch ${i} -- done`)
             } catch (e) {
                 console.log(`${token}: trying to init epoch ${i} -- error`)
+                console.log(e)
             }
 
             await sleep(1000)
