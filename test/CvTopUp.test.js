@@ -7,7 +7,7 @@ describe('YieldFarm UNiX Pool', function () {
     let user, communityVault, userAddr, communityVaultAddr
     let unixToken, uniLP
 
-    const TOTAL_TOKENS = 48000000
+    const TOTAL_TOKENS = 24000000
     const NR_OF_EPOCHS = 6
     const epochDuration = 1000
 

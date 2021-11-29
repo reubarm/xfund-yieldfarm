@@ -3,8 +3,8 @@ const BN = ethers.BigNumber
 
 async function main () {
     const tenPow18 = BN.from(10).pow(18)
-    const DISTRIBUTED_AMOUNT_LP = 48000000
-    const DISTRIBUTED_AMOUNT_UNIX = 12000000
+    const DISTRIBUTED_AMOUNT_LP = 24000000
+    const DISTRIBUTED_AMOUNT_UNIX = 6000000
 
     // Epoch 1 starts at Thu Feb 18 2021 12:00:00 GMT+0000 with an epoch duration of 4 weeks
     const EPOCH_1_START_TIME = 1613649600

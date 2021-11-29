@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "build": "hardhat compile",
     "test": "hardhat test",
     "coverage": "npx hardhat coverage --network coverage",
     "lint": "npm run lint:js && npm run lint:sol",
