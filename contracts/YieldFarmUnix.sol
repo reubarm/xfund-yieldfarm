@@ -12,7 +12,7 @@ contract YieldFarmUnix {
     using SafeMath for uint128;
 
     // constants
-    uint public constant TOTAL_DISTRIBUTED_AMOUNT = 12000000;
+    uint public constant TOTAL_DISTRIBUTED_AMOUNT = 6000000;
     uint public constant NR_OF_EPOCHS = 6;
     uint128 public constant EPOCHS_DELAYED_FROM_STAKING_CONTRACT = 0;
 

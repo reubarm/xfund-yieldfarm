@@ -3,14 +3,14 @@ const BN = ethers.BigNumber
 
 async function main () {
     const tenPow18 = BN.from(10).pow(18)
-    const DISTRIBUTED_AMOUNT_LP = 48000000
-    const DISTRIBUTED_AMOUNT_UNIX = 12000000
-    // Epoch 1 starts at Wed, 24 Nov 2021 00:00:00 +0000 UTC with an epoch duration of 6 hours
-    const EPOCH_1_START_TIME = 1637712000
-    const EPOCH_LENGTH = 21600 // 6 hours
+    const DISTRIBUTED_AMOUNT_LP = 24000000
+    const DISTRIBUTED_AMOUNT_UNIX = 6000000
+    // Epoch 1 starts at Mon Nov 29 2021 10:00:00 GMT+0000 with an epoch duration of 1 hour
+    const EPOCH_1_START_TIME = 1638180000
+    const EPOCH_LENGTH = 3600 // 6 hours
 
     const unix = '0xDDD6A0ECc3c6F6C102E5eA3d8Af7B801d1a77aC8'
-    const unilp = '0xb85d6cd4d8102ceff4d95bf8d12478eeb55345c7'
+    const unilp = '0xdec047b52fc35ac30d21a09ceb79c85e38d07936'
 
     // Load UNiX ABI
     const UNiX = await ethers.getContractAt('ERC20Mock', unix)

@@ -31,12 +31,12 @@ Modifications are as follows:
 
 - [UNiX](https://rinkeby.etherscan.io/address/0xDDD6A0ECc3c6F6C102E5eA3d8Af7B801d1a77aC8)
 
-- [Uniswap UNiX-ETH LP](https://rinkeby.etherscan.io/address/0xb85d6cd4d8102ceff4d95bf8d12478eeb55345c7)
+- [Uniswap UNiX-USDC LP](https://rinkeby.etherscan.io/address/0xdec047b52fc35ac30d21a09ceb79c85e38d07936)
 
-- [Staking](https://rinkeby.etherscan.io/address/0x84D72A804bC00DABe61de2Edf3131acCe3e83ef1#code)
+- [Staking](https://rinkeby.etherscan.io/address/0xFf4c3a49Fc24e9727307c7c44ff46F740f6783a1#code)
 
-- [Community Vault](https://rinkeby.etherscan.io/address/0x69D1C2F23C1665A5d19e78106522e8e05d407dA1#code)
+- [Community Vault](https://rinkeby.etherscan.io/address/0x4098600a916616C16c5b55bdb3F992628a312B4e#code)
 
-- [Yield Farm LP](https://rinkeby.etherscan.io/address/0x329cd24CDbcF58f1011A56A077E8A5cAd5c8B5E3#code)
+- [Yield Farm LP](https://rinkeby.etherscan.io/address/0xa61F4Fb0E2C47B7677dFeac59CB594daeCC2AC88#code)
 
-- [Yield Farm UNiX](https://rinkeby.etherscan.io/address/0x8eD7Ff716e9462C71CA0496C82CAFA6ec4997565#code)
+- [Yield Farm UNiX](https://rinkeby.etherscan.io/address/0xBf8D9dF45B53a2D3c271327B6AccaE2532F3C82D#code)
