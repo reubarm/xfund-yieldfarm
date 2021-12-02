@@ -3,15 +3,15 @@ const BN = ethers.BigNumber
 
 async function main () {
     const tenPow18 = BN.from(10).pow(18)
-    const DISTRIBUTED_AMOUNT_LP = 24000000
-    const DISTRIBUTED_AMOUNT_UNIX = 6000000
+    const DISTRIBUTED_AMOUNT_LP = 13500000
+    const DISTRIBUTED_AMOUNT_UNIX = 4500000
 
-    // Epoch 1 starts at Thu Feb 18 2021 12:00:00 GMT+0000 with an epoch duration of 4 weeks
-    const EPOCH_1_START_TIME = 1613649600
-    const EPOCH_LENGTH = 2419200 // 4 weeks
+    // Epoch 1 starts at Fri Dec 03 2021 08:00:00 GMT+0000 with an epoch duration of 30 days
+    const EPOCH_1_START_TIME = 1638518400
+    const EPOCH_LENGTH = 2592000 // 30 days
 
-    const unix = '0x892a6f9df0147e5f079b0993f486f9aca3c87881'
-    const unilp = '0xab2d2f5bc36620a57ec4bb60d6a7df2a847deab5'
+    const unix = '0xddd6a0ecc3c6f6c102e5ea3d8af7b801d1a77ac8'
+    const unilp = '0xccab68f48531215b0707e8d908c43e7de73dbdbc'
 
     // Staking contract
     const Staking = await ethers.getContractFactory('Staking')
