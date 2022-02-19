@@ -1,15 +1,18 @@
 const { expect } = require('chai')
 const { ethers } = require('hardhat')
 
-describe('YieldFarm UNiX Pool', function () {
+describe('YieldFarm UNiX Pool v2', function () {
     let yieldFarm
     let staking
     let user, communityVault, userAddr, communityVaultAddr
     let unixToken, creatorAcc
 
-    const TOTAL_TOKENS = 4500000
+    const TOTAL_TOKENS = 1500000
     const NR_OF_EPOCHS = 6
-    const epochDuration = 1000
+    const NR_EPOCHS_DELAY_FROM_STAKING = 3 // new farm will be Thu Mar 03 2022 08:00:00 GMT+0000
+    const EPOCH_1_START_TIME_STAKING = 1638518400 // Fri Dec 03 2021 08:00:00 GMT+0000
+    const EPOCH_1_START_TIME_FARM = 1646294400 // Thu Mar 03 2022 08:00:00 GMT+0000
+    const EPOCH_LENGTH = 2592000 // 30 days
 
     const distributedAmount = ethers.BigNumber.from(TOTAL_TOKENS).mul(ethers.BigNumber.from(10).pow(18))
     let snapshotId
@@ -26,7 +29,7 @@ describe('YieldFarm UNiX Pool', function () {
 
         const Staking = await ethers.getContractFactory('Staking', creator)
 
-        staking = await Staking.deploy(Math.floor(Date.now() / 1000) + 1000, epochDuration)
+        staking = await Staking.deploy(EPOCH_1_START_TIME_STAKING, EPOCH_LENGTH)
         await staking.deployed()
 
         const ERC20Mock = await ethers.getContractFactory('ERC20Mock')
@@ -35,7 +38,8 @@ describe('YieldFarm UNiX Pool', function () {
         unixToken = await ERC20Mock.deploy()
         communityVault = await CommunityVault.deploy(unixToken.address)
         communityVaultAddr = communityVault.address
-        const YieldFarm = await ethers.getContractFactory('YieldFarmUnix')
+
+        const YieldFarm = await ethers.getContractFactory('YieldFarmUnix2')
         yieldFarm = await YieldFarm.deploy(
             unixToken.address,
             staking.address,
@@ -56,16 +60,49 @@ describe('YieldFarm UNiX Pool', function () {
             expect(unixToken.address).to.not.equal(0)
         })
 
+        it('new farm should be epoch 0 when deployed', async function () {
+            // set to a little before this farm begins
+            await moveAtEpoch(3)
+            expect(await yieldFarm.getCurrentEpoch()).to.equal(0)
+            expect(await yieldFarm.epochStart()).to.equal(EPOCH_1_START_TIME_FARM)
+        })
+
+        it('new farm should be epoch 1 at farm start time', async function () {
+            await setNextBlockTimestamp(EPOCH_1_START_TIME_FARM)
+            await ethers.provider.send('evm_mine')
+            expect(await yieldFarm.getCurrentEpoch()).to.equal(1)
+        })
+
+        it('correct farm epoch offset', async function () {
+            // farm epoch 0 = staking epoch 3
+            await moveAtEpoch(3)
+            expect(await yieldFarm.getCurrentEpoch()).to.equal(0)
+
+            await moveAtEpoch(4)
+            expect(await yieldFarm.getCurrentEpoch()).to.equal(1)
+
+            await moveAtEpoch(5)
+            expect(await yieldFarm.getCurrentEpoch()).to.equal(2)
+        })
+
         it('Get epoch PoolSize and distribute tokens', async function () {
+            // move chain to block for staking epoch 3
+            await moveAtEpoch(NR_EPOCHS_DELAY_FROM_STAKING) // staking epoch 3, farm epoch 0
+            // init up to but not including current staking epoch (2)
+            await manuallyInitFarmEpoch(unixToken.address)
+            // deposit - should init staking epoch 3 (farm epoch 0) for this farm contract
             await depositUNiX(amount)
-            await moveAtEpoch(2)
+            // move chain to staking epoch 5 (farm epoch 2)
+            await moveAtEpoch(NR_EPOCHS_DELAY_FROM_STAKING + 2)
             const totalAmount = amount
 
             expect(await yieldFarm.getPoolSize(1)).to.equal(totalAmount)
             expect(await yieldFarm.getEpochStake(userAddr, 1)).to.equal(totalAmount)
             expect(await unixToken.allowance(communityVaultAddr, yieldFarm.address)).to.equal(distributedAmount)
             expect(await yieldFarm.getCurrentEpoch()).to.equal(2)
+            expect(await staking.getCurrentEpoch()).to.equal(5)
 
+            // harvest from completed farm epoch 1 (staking epoch 4 - currently in 5)
             await yieldFarm.connect(user).harvest(1)
             expect(await unixToken.balanceOf(userAddr)).to.equal(distributedAmount.div(NR_OF_EPOCHS))
             await expect(yieldFarm.harvest(2)).to.be.revertedWith('This epoch is in the future')
@@ -74,14 +111,18 @@ describe('YieldFarm UNiX Pool', function () {
 
     describe('Contract Tests', function () {
         it('User harvest and mass Harvest', async function () {
+            // move chain to block for staking epoch 3
+            await moveAtEpoch(NR_EPOCHS_DELAY_FROM_STAKING) // staking epoch 3, farm epoch 0
+            // init up to but not including current staking epoch (2)
+            await manuallyInitFarmEpoch(unixToken.address)
             await depositUNiX(amount)
             const totalAmount = amount
             // initialize epochs meanwhile
-            await moveAtEpoch(7)
+            await moveAtEpoch(7) // farm epoch 4
             expect(await yieldFarm.getPoolSize(1)).to.equal(amount)
 
             expect(await yieldFarm.lastInitializedEpoch()).to.equal(0) // no epoch initialized
-            await expect(yieldFarm.harvest(7)).to.be.revertedWith('This epoch is in the future')
+            await expect(yieldFarm.harvest(5)).to.be.revertedWith('This epoch is in the future')
             await expect(yieldFarm.harvest(2)).to.be.revertedWith('Harvest in order')
             await (await yieldFarm.connect(user).harvest(1)).wait()
 
@@ -92,21 +133,31 @@ describe('YieldFarm UNiX Pool', function () {
             expect(await yieldFarm.lastInitializedEpoch()).to.equal(1) // epoch 1 have been initialized
 
             await (await yieldFarm.connect(user).massHarvest()).wait()
-            const totalDistributedAmount = amount.mul(distributedAmount.div(NR_OF_EPOCHS)).div(totalAmount).mul(6)
+            const totalDistributedAmount = amount.mul(distributedAmount.div(NR_OF_EPOCHS)).div(totalAmount).mul(3)
             expect(await unixToken.balanceOf(userAddr)).to.equal(totalDistributedAmount)
-            expect(await yieldFarm.connect(user).userLastEpochIdHarvested()).to.equal(6)
-            expect(await yieldFarm.lastInitializedEpoch()).to.equal(6) // epoch 7 have been initialized
+            expect(await yieldFarm.connect(user).userLastEpochIdHarvested()).to.equal(3)
+            expect(await yieldFarm.lastInitializedEpoch()).to.equal(3) // epoch 3 have been initialized
         })
         it('Have nothing to harvest', async function () {
+            // move chain to block for staking epoch 3
+            await moveAtEpoch(NR_EPOCHS_DELAY_FROM_STAKING) // staking epoch 3, farm epoch 0
+            // init up to but not including current staking epoch (2)
+            await manuallyInitFarmEpoch(unixToken.address)
+            // deposit as "user" account
             await depositUNiX(amount)
-            await moveAtEpoch(3)
+            await moveAtEpoch(6) // farm epoch 3
             expect(await yieldFarm.getPoolSize(1)).to.equal(amount)
+            // harvest with "creatorAcc" account (has no deposit)
             await yieldFarm.connect(creatorAcc).harvest(1)
             expect(await unixToken.balanceOf(await creatorAcc.getAddress())).to.equal(0)
             await yieldFarm.connect(creatorAcc).massHarvest()
             expect(await unixToken.balanceOf(await creatorAcc.getAddress())).to.equal(0)
         })
-        it('harvest maximum 10 epochs', async function () {
+        it('harvest maximum 6 farm epochs', async function () {
+            // move chain to block for staking epoch 3
+            await moveAtEpoch(NR_EPOCHS_DELAY_FROM_STAKING) // staking epoch 3, farm epoch 0
+            // init up to but not including current staking epoch (2)
+            await manuallyInitFarmEpoch(unixToken.address)
             await depositUNiX(amount)
             const totalAmount = amount
             await moveAtEpoch(300)
@@ -121,7 +172,7 @@ describe('YieldFarm UNiX Pool', function () {
             expect(await yieldFarm.getCurrentEpoch()).to.equal(0)
         })
         it('it should return 0 if no deposit in an epoch', async function () {
-            await moveAtEpoch(10)
+            await moveAtEpoch(8)
             await yieldFarm.connect(user).harvest(1)
             expect(await unixToken.balanceOf(await user.getAddress())).to.equal(0)
         })
@@ -129,6 +180,10 @@ describe('YieldFarm UNiX Pool', function () {
 
     describe('Events', function () {
         it('Harvest emits Harvest', async function () {
+            // move chain to block for staking epoch 3
+            await moveAtEpoch(NR_EPOCHS_DELAY_FROM_STAKING) // staking epoch 3, farm epoch 0
+            // init up to but not including current staking epoch (2)
+            await manuallyInitFarmEpoch(unixToken.address)
             await depositUNiX(amount)
             await moveAtEpoch(5)
 
@@ -137,17 +192,17 @@ describe('YieldFarm UNiX Pool', function () {
         })
 
         it('MassHarvest emits MassHarvest', async function () {
+            // move chain to block for staking epoch 3
+            await moveAtEpoch(NR_EPOCHS_DELAY_FROM_STAKING) // staking epoch 3, farm epoch 0
+            // init up to but not including current staking epoch (2)
+            await manuallyInitFarmEpoch(unixToken.address)
             await depositUNiX(amount)
-            await moveAtEpoch(5)
+            await moveAtEpoch(6)
 
             await expect(yieldFarm.connect(user).massHarvest())
                 .to.emit(yieldFarm, 'MassHarvest')
         })
     })
-
-    function getCurrentUnix () {
-        return Math.floor(Date.now() / 1000)
-    }
 
     async function setNextBlockTimestamp (timestamp) {
         const block = await ethers.provider.send('eth_getBlockByNumber', ['latest', false])
@@ -157,7 +212,7 @@ describe('YieldFarm UNiX Pool', function () {
     }
 
     async function moveAtEpoch (epoch) {
-        await setNextBlockTimestamp(getCurrentUnix() + epochDuration * epoch)
+        await setNextBlockTimestamp(EPOCH_1_START_TIME_STAKING + EPOCH_LENGTH * (epoch - 1))
         await ethers.provider.send('evm_mine')
     }
 
@@ -166,5 +221,20 @@ describe('YieldFarm UNiX Pool', function () {
         await unixToken.mint(ua, x)
         await unixToken.connect(u).approve(staking.address, x)
         return await staking.connect(u).deposit(unixToken.address, x)
+    }
+
+    async function manuallyInitFarmEpoch (farmTokenAddress, u = user) {
+        const currentStakingEpoch = parseInt(await staking.getCurrentEpoch())
+        let initializedFarmEpoch = -1
+        for (let i = currentStakingEpoch + 1; i >= 0; i--) {
+            const ok = await staking.epochIsInitialized(farmTokenAddress, i)
+            if (ok) {
+                initializedFarmEpoch = i
+                break
+            }
+        }
+        for (let i = initializedFarmEpoch + 1; i < currentStakingEpoch; i++) {
+            await staking.connect(u).manualEpochInit([farmTokenAddress], i)
+        }
     }
 })
