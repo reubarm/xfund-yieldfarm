@@ -30,6 +30,10 @@ Modifications are as follows:
 - [Yield Farm LP](https://etherscan.io/address/0xFAaDf53DAf0B2B32D5F2Db14F1F23FA57BA51304#code)
 
 - [Yield Farm UNiX](https://etherscan.io/address/0x98E0d8FC5d7B2341Ea943f9B4cf020dB672d5e10#code)
+-
+- [Yield Farm LP v2](https://etherscan.io/address/0x90266aC66d650d627B66b4Edcc5ddeec3609e0eC#code)
+
+- [Yield Farm UNiX v2](https://etherscan.io/address/0xaBd3438dFe607daAB1af1a76e8cBAA7786324d53#code)
 
 ###  Rinkeby Testnet
 
